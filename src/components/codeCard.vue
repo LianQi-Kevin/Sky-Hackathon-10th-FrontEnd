@@ -117,15 +117,15 @@ html.dark .shiki span {
 
 
   .codeCard__code {
+    display: grid;
+    width: 100%;
+    position: relative;
+
     :deep(pre) {
       overflow-y: hidden;
       border-radius: 0 0 .375rem .375rem;
       margin: 0;
     }
-
-    display: grid;
-    width: 100%;
-    position: relative;
   }
 }
 </style>

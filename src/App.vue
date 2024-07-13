@@ -11,27 +11,6 @@ import mainHeader from '@/components/mainHeader.vue';
   </div>
 </template>
 
-<style lang="scss">
-// 覆盖全局滚动条样式（仿 el-scrollbar）
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar:horizontal {
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--el-scrollbar-bg-color, var(--el-text-color-secondary));
-  border-radius: 9999px;
-  transition: all 0.2s ease-in-out;
-}
-</style>
-
 <style lang="scss" scoped>
 .mainContainer {
   height: 100%;

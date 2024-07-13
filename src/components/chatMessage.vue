@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import md from '@/markdown/markdown'
 import {Help} from "@element-plus/icons-vue";
-import CodeCard from "@/components/CodeCard.vue";
+import CodeCard from "@/components/codeCard.vue";
 import {useThrottleFn} from "@vueuse/core";
 
 import "@/styles/github-markdown.css"
