@@ -13,18 +13,6 @@ interface ChatMessage {
 
 const chatMessagesLists = ref<ChatMessage[]>([])
 
-chatMessagesLists.value = [
-  {role: 'system', content: 'Hello, I am a system.'},
-  {role: 'user', content: 'Hello, I am a user.'},
-  {role: 'assistant', content: 'Hello, I am an assistant.'},
-  {role: 'user', content: 'Hello, I am a user.'},
-  {role: 'assistant', content: 'Here is some python example. \n ' +
-      '```python\n' +
-      'def test_func():\n    ' +
-      'print("Hello, I am a assistant.Hello")\n```'
-  },
-]
-
 // Prompt Input Actions
 const inputValue = ref<string>('')
 const submitLoading = ref<boolean>(false)
@@ -48,7 +36,15 @@ function submitMessage() {
 <template>
   <div class="container">
     <div class="chatContainer">
-      <div class="chatMessages" >
+      <div class="chatMessages" v-show="chatMessagesLists.length === 0">
+        <el-empty style="height: 100%;">
+          <template #default >
+            <h2>欢迎使用国标咨询工具</h2>
+            <p>请在下方输入框输入您的问题</p>
+          </template>
+        </el-empty>
+      </div>
+      <div class="chatMessages" v-show="chatMessagesLists.length !== 0">
         <template v-for="(message, index) in chatMessagesLists" :key="index">
           <chat-message :content="message.content" :role="message.role"/>
         </template>
@@ -62,13 +58,17 @@ function submitMessage() {
         <el-switch v-model="modeSwitchRef" active-text="方案对比" inactive-text="对话咨询" size="large"/>
       </div>
 
+      <div class="uploadArea">
+
+      </div>
+
       <h4>国家标准</h4>
 
-      <file-uploader />
+      <file-uploader accept_type="application/pdf" @fileUpload="(option) => {console.log(option)}"/>
 
-      <h4>设计参数</h4>
+      <h4 v-if="modeSwitchRef">设计参数</h4>
 
-
+      <file-uploader accept_type="application/plaintext" v-if="modeSwitchRef"  @fileUpload="(option) => {console.log(option)}"/>
     </div>
 
   </div>
@@ -107,6 +107,10 @@ function submitMessage() {
       overflow-y: auto;
       overflow-x: hidden;
 
+      :deep(.el-empty__description) {
+        display: none;
+      }
+
       .chatMessage {
         font-size: 1rem;
       }
@@ -127,6 +131,10 @@ function submitMessage() {
 
       border-radius: 6px;
       border: 1px dashed var(--el-border-color)
+    }
+
+    h4 {
+      margin: 10px 0;
     }
   }
 
