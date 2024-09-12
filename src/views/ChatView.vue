@@ -1,9 +1,15 @@
 <script lang="ts" setup>
 import chatInputArea from "@/components/chatInputArea.vue";
 import FileUploader from "@/components/fileUploader.vue";
+// import {ElMessage} from "element-plus";
+// import type {ApiConfigsType} from "@/components/settingDialog.vue";
+// import { initializeWebSocket } from '@/network/websockers';
 
 // File Upload Actions
 const modeSwitchRef = ref<boolean>(false)
+const standardModeRef = ref<boolean>(false)
+
+// const apiConfigs = inject<ApiConfigsType>('apiConfigs')
 
 // Chat Messages Tools
 interface ChatMessage {
@@ -31,16 +37,78 @@ function submitMessage() {
     }
   })
 }
+
+
+// 国标及设计参数文件 todo: 临时能用
+// interface fileInfo {
+//   file_uuid: string;
+//   filename: string;
+// }
+
+// interface fileUploadSuccessResponse extends fileInfo{
+//   message: string
+//   client_id: string
+// }
+//
+// const standard_file = ref<fileInfo>({
+//   file_uuid: '',
+//   filename: ''
+// })
+// const parameter_file = ref<fileInfo>({
+//   file_uuid: '',
+//   filename: ''
+// })
+//
+// interface onMessageTypes {
+//   type: "embedding" | "message";
+//   status: "processing" | "complete";
+//   problems?: string
+// }
+
+// function WSS_onMessage(data: onMessageTypes) {
+//   switch (data.type) {
+//     case "embedding":
+//       if (data.status === "processing") {
+//         ElMessage({
+//           duration: 15,
+//           message: 'embedding 正在处理中，请稍后...',
+//           type: 'info'
+//         })
+//       } else {
+//         ElMessage({
+//           message: 'embedding 已完成',
+//           type: 'success'
+//         })
+//       }
+//       break;
+//     case "message":
+//       if (data.status === "processing") {
+//         chatMessagesLists.value.push({role: 'assistant', content: '正在处理中，请稍后...'})
+//       } else {
+//         chatMessagesLists.value[chatMessagesLists.value.length - 1] = ({role: 'assistant', content: data.problems as string})
+//       }
+//       break;
+//   }
+// }
+
+// const ws = initializeWebSocket(
+//   apiConfigs?.NVIDIA_API_KEY!,
+//   apiConfigs?.client_id!,
+//   WSS_onMessage
+// );
 </script>
 
 <template>
+<!--  <el-button @click="WSS_onMessage({type: 'embedding', status: 'processing', problems: 'finish_info'})"></el-button>-->
+
   <div class="container">
     <div class="chatContainer">
       <div class="chatMessages" v-show="chatMessagesLists.length === 0">
         <el-empty style="height: 100%;">
           <template #default >
             <h2>欢迎使用国标咨询工具</h2>
-            <p>请在下方输入框输入您的问题</p>
+            <p v-if="modeSwitchRef">请在上传您的设计参数文档以进行校验</p>
+            <p v-else>请在下方输入框输入您的问题</p>
           </template>
         </el-empty>
       </div>
@@ -50,7 +118,8 @@ function submitMessage() {
         </template>
       </div>
 
-      <chatInputArea v-model:inputValue="inputValue" v-model:submitLoading="submitLoading" @submit="submitMessage"/>
+      <el-button v-if="modeSwitchRef" round style="padding: 10px;margin: 0 10px 10px 20px;">开始对比</el-button>
+      <chatInputArea v-model:inputValue="inputValue" v-model:submitLoading="submitLoading" @submit="submitMessage" v-else/>
     </div>
 
     <div class="fileUploadArea">
@@ -59,16 +128,36 @@ function submitMessage() {
       </div>
 
       <div class="uploadArea">
+        <div class="standard">
+          <div class="standard__title" style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline">
+            <h4>国家标准</h4>
+            <el-switch v-model="standardModeRef" active-text="选择现有标准" inactive-text="上传新标准" size="small" disabled/>
+          </div>
+          <el-select
+            v-show="standardModeRef"
+          >
 
+          </el-select>
+
+          <file-uploader
+            v-show="!standardModeRef"
+
+            :accept_type="'application/pdf'"
+            :auto-upload="true"
+            :process="true"
+            @on-success="(response) => {}"
+          />
+        </div>
+        <el-divider v-if="modeSwitchRef" />
+        <div class="userFile" v-if="modeSwitchRef">
+          <h4>用户文件</h4>
+          <file-uploader
+            :accept_type="'application/pdf,.md,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+            :process="false"
+            @on-success="(response) => {}"
+          />
+        </div>
       </div>
-
-      <h4>国家标准</h4>
-
-      <file-uploader accept_type="application/pdf" @fileUpload="(option) => {console.log(option)}"/>
-
-      <h4 v-if="modeSwitchRef">设计参数</h4>
-
-      <file-uploader accept_type="application/plaintext" v-if="modeSwitchRef"  @fileUpload="(option) => {console.log(option)}"/>
     </div>
 
   </div>
@@ -119,7 +208,7 @@ function submitMessage() {
 
   .fileUploadArea {
     width: 100%;
-    max-width: 250px;
+    max-width: 260px;
 
     display: flex;
     flex-direction: column;
@@ -131,10 +220,6 @@ function submitMessage() {
 
       border-radius: 6px;
       border: 1px dashed var(--el-border-color)
-    }
-
-    h4 {
-      margin: 10px 0;
     }
   }
 

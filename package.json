@@ -12,8 +12,12 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@types/crypto-js": "^4.2.2",
+    "@volar/language-server": "2.4.0-alpha.18",
+    "@vue/language-server": "2.0.28",
     "@vueuse/core": "^10.11.0",
     "axios": "^1.7.2",
+    "crypto-js": "^4.2.0",
     "element-plus": "^2.7.6",
     "markdown-it": "^14.1.0",
     "vue": "^3.4.29",
