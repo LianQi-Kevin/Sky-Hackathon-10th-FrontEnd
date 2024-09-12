@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import {RouterView} from 'vue-router'
 import mainHeader from '@/components/mainHeader.vue';
-
 </script>
 
 <template>
   <div class="mainContainer">
-    <mainHeader style="flex-grow: 0"/>
+    <mainHeader />
     <RouterView style="flex-grow: 1"/>
   </div>
 </template>

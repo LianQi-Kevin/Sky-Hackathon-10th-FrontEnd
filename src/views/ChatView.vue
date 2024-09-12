@@ -2,14 +2,11 @@
 import chatInputArea from "@/components/chatInputArea.vue";
 import FileUploader from "@/components/fileUploader.vue";
 // import {ElMessage} from "element-plus";
-// import type {ApiConfigsType} from "@/components/settingDialog.vue";
 // import { initializeWebSocket } from '@/network/websockers';
 
 // File Upload Actions
 const modeSwitchRef = ref<boolean>(false)
 const standardModeRef = ref<boolean>(false)
-
-// const apiConfigs = inject<ApiConfigsType>('apiConfigs')
 
 // Chat Messages Tools
 interface ChatMessage {

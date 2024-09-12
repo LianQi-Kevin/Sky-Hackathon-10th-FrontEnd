@@ -9,13 +9,7 @@ import type {
 
 } from "element-plus";
 
-// import {fileAjaxUpload} from "@/network/file";
-
-
 import { genFileId } from 'element-plus'
-import type {ApiConfigsType} from "@/components/settingDialog.vue";
-
-const apiConfigs = inject<ApiConfigsType>('apiConfigs')
 
 interface propsType {
   process?: boolean;
