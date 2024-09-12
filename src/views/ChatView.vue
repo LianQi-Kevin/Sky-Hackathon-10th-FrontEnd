@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import chatInputArea from "@/components/chatInputArea.vue";
 import FileUploader from "@/components/fileUploader.vue";
-// import {ElMessage} from "element-plus";
-// import { initializeWebSocket } from '@/network/websockers';
 
 // File Upload Actions
 const modeSwitchRef = ref<boolean>(false)
@@ -14,7 +12,19 @@ interface ChatMessage {
   content: string;
 }
 
-const chatMessagesLists = ref<ChatMessage[]>([])
+const chatMessagesLists = ref<ChatMessage[]>([
+  {role: 'user', content: '欢迎使用国标咨询工具'},
+  {role: 'assistant', content: '请在下方输入框输入您的问题'},
+  {role: 'user', content: '欢迎使用国标咨询工具'},
+  {role: 'assistant', content: '请在下方输入框输入您的问题'},
+  {role: 'user', content: '欢迎使用国标咨询工具'},
+  {role: 'assistant', content: '请在下方输入框输入您的问题'},
+  {role: 'user', content: '欢迎使用国标咨询工具'},
+  {role: 'assistant', content: '请在下方输入框输入您的问题'},
+  {role: 'user', content: '欢迎使用国标咨询工具'},
+  {role: 'assistant', content: '请在下方输入框输入您的问题'},
+  {role: 'user', content: '欢迎使用国标咨询工具'},
+])
 
 // Prompt Input Actions
 const inputValue = ref<string>('')
@@ -34,65 +44,6 @@ function submitMessage() {
     }
   })
 }
-
-
-// 国标及设计参数文件 todo: 临时能用
-// interface fileInfo {
-//   file_uuid: string;
-//   filename: string;
-// }
-
-// interface fileUploadSuccessResponse extends fileInfo{
-//   message: string
-//   client_id: string
-// }
-//
-// const standard_file = ref<fileInfo>({
-//   file_uuid: '',
-//   filename: ''
-// })
-// const parameter_file = ref<fileInfo>({
-//   file_uuid: '',
-//   filename: ''
-// })
-//
-// interface onMessageTypes {
-//   type: "embedding" | "message";
-//   status: "processing" | "complete";
-//   problems?: string
-// }
-
-// function WSS_onMessage(data: onMessageTypes) {
-//   switch (data.type) {
-//     case "embedding":
-//       if (data.status === "processing") {
-//         ElMessage({
-//           duration: 15,
-//           message: 'embedding 正在处理中，请稍后...',
-//           type: 'info'
-//         })
-//       } else {
-//         ElMessage({
-//           message: 'embedding 已完成',
-//           type: 'success'
-//         })
-//       }
-//       break;
-//     case "message":
-//       if (data.status === "processing") {
-//         chatMessagesLists.value.push({role: 'assistant', content: '正在处理中，请稍后...'})
-//       } else {
-//         chatMessagesLists.value[chatMessagesLists.value.length - 1] = ({role: 'assistant', content: data.problems as string})
-//       }
-//       break;
-//   }
-// }
-
-// const ws = initializeWebSocket(
-//   apiConfigs?.NVIDIA_API_KEY!,
-//   apiConfigs?.client_id!,
-//   WSS_onMessage
-// );
 </script>
 
 <template>
@@ -115,8 +66,8 @@ function submitMessage() {
         </template>
       </div>
 
-      <el-button v-if="modeSwitchRef" round style="padding: 10px;margin: 0 10px 10px 20px;">开始对比</el-button>
-      <chatInputArea v-model:inputValue="inputValue" v-model:submitLoading="submitLoading" @submit="submitMessage" v-else/>
+      <el-button v-if="modeSwitchRef" class="invokeBtn" round>开始对比</el-button>
+      <chatInputArea v-else v-model:inputValue="inputValue" v-model:submitLoading="submitLoading" class="queryBtn" @submit="submitMessage"/>
     </div>
 
     <div class="fileUploadArea">
@@ -142,16 +93,14 @@ function submitMessage() {
             :accept_type="'application/pdf'"
             :auto-upload="true"
             :process="true"
-            @on-success="(response) => {}"
           />
         </div>
         <el-divider v-if="modeSwitchRef" />
         <div class="userFile" v-if="modeSwitchRef">
-          <h4>用户文件</h4>
+          <h4>用户设计文件</h4>
           <file-uploader
             :accept_type="'application/pdf,.md,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
             :process="false"
-            @on-success="(response) => {}"
           />
         </div>
       </div>
@@ -200,6 +149,15 @@ function submitMessage() {
       .chatMessage {
         font-size: 1rem;
       }
+    }
+
+    .invokeBtn {
+      padding: 10px;
+      margin: 0 10px 10px 20px;
+    }
+
+    .queryBtn {
+      margin: 2px 10px 10px 20px;
     }
   }
 

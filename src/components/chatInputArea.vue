@@ -48,23 +48,51 @@ function handleEnterKey(event: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="chatPromptArea">
-    <el-input class="inputText" type="textarea" autofocus v-model="inputValue"
-              :autosize="props.roleSize" :maxlength="props.maxlength" :placeholder="props.placeholder"
-              @keyup.enter.native="handleEnterKey" />
-    <el-button :disabled="!(inputValue.length > 0) || submitLoading" class="submitBtn" @click="emit('submit')">
-      <el-icon v-show="!submitLoading" size="17"><Promotion/></el-icon>
-      <el-icon v-show="submitLoading" class="is-loading" size="17"><Loading/></el-icon>
-    </el-button>
+  <div class="content" style="position: relative">
+    <div class="fill"/>
+    <div class="chatPromptArea">
+      <el-input v-model="inputValue" :autosize="props.roleSize" :maxlength="props.maxlength" :placeholder="props.placeholder"
+                autofocus class="inputText" type="textarea"
+                @keyup.enter.native="handleEnterKey" />
+      <el-button :disabled="!(inputValue.length > 0) || submitLoading" class="submitBtn" @click="emit('submit')">
+        <el-icon v-show="!submitLoading" size="17"><Promotion/></el-icon>
+        <el-icon v-show="submitLoading" class="is-loading" size="17"><Loading/></el-icon>
+      </el-button>
+    </div>
   </div>
 </template>
 
+<style lang="scss">
+html.dark {
+  --el-blur-glass: mix(var(--el-bg-color), rgba(0, 0, 0, 0.7), 0.7);
+}
+html {
+  --el-blur-glass: mix(var(--el-bg-color), rgba(255, 255, 255, 0.7), 0.7);
+}
+</style>
+
 <style scoped lang="scss">
+.fill {
+  //border: 1px white solid;
+  padding: 10px;
+  margin: 0 10px 10px 20px;
+}
+
 .chatPromptArea {
   border: 1px solid var(--el-box-shadow);
   box-shadow: var(--el-box-shadow-lighter);
 
   border-radius: 6px;
+
+  // absolute
+  position: absolute;
+  bottom: -10px;
+  width: calc(100% - 20px);
+
+  // 毛玻璃
+  background: var(--el-blur-glass) !important;
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(15px);
 
   display: flex;
   flex-direction: row;
@@ -72,10 +100,11 @@ function handleEnterKey(event: KeyboardEvent) {
 
   padding: 10px;
 
-  margin: 0 10px 10px 20px;
+  margin: 0 10px 10px 0;
 
   .inputText {
     :deep(.el-textarea__inner) {
+      background: none;
       border-radius: 10px;
       resize: none;
       border: none;
