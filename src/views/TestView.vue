@@ -61,7 +61,7 @@ const schema_response = ref<FileUploadDBResponse>({
 function fileEmbedded(file_id: string, file_md5: string, nv_api_key: string){
   console.debug("fileEmbedded", file_id, file_md5)
 
-  const socket = new WebSocket(`/ws_api/file/${file_id}?file_md5=${file_md5}&nv_api_key=${nv_api_key}`)
+  const socket = new WebSocket(`/api/file/${file_id}?file_md5=${file_md5}&nv_api_key=${nv_api_key}`)
   socket.onopen = function() {
     console.debug("socket open")
   }
@@ -84,7 +84,7 @@ function fileEmbedded(file_id: string, file_md5: string, nv_api_key: string){
 function invokeCompare(standard_file_id: string, schema_file_id: string, standard_file_md5: string, schema_file_md5: string, nv_api_key: string){
   console.debug("invokeCompare", standard_file_id, schema_file_id)
 
-  const socket = new WebSocket(`/ws_api/invoke/compare?standard_file_id=${standard_file_id}&schema_file_id=${schema_file_id}&standard_file_md5=${standard_file_md5}&schema_file_md5=${schema_file_md5}&nv_api_key=${nv_api_key}`)
+  const socket = new WebSocket(`/api/invoke/compare?standard_file_id=${standard_file_id}&schema_file_id=${schema_file_id}&standard_file_md5=${standard_file_md5}&schema_file_md5=${schema_file_md5}&nv_api_key=${nv_api_key}`)
   socket.onopen = function() {
     console.debug("socket open")
   }
@@ -107,7 +107,7 @@ function invokeCompare(standard_file_id: string, schema_file_id: string, standar
 function invokeQuery(standard_file_id: string, standard_file_md5: string, question: string, nv_api_key: string){
   console.debug("invokeQuery", standard_file_id, standard_file_md5)
 
-  const socket = new WebSocket(`/ws_api/invoke/query?standard_file_id=${standard_file_id}&standard_file_md5=${standard_file_md5}&question=${question}&nv_api_key=${nv_api_key}`)
+  const socket = new WebSocket(`/api/invoke/query?standard_file_id=${standard_file_id}&standard_file_md5=${standard_file_md5}&question=${question}&nv_api_key=${nv_api_key}`)
   socket.onopen = function() {
     console.debug("socket open")
   }
