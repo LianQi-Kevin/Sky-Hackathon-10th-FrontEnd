@@ -27,6 +27,7 @@ const isDark = useDark()
 
     <el-menu-item index="/home">Chat</el-menu-item>
     <el-menu-item index="/about">About</el-menu-item>
+    <el-menu-item index="/test">Test</el-menu-item>
 
     <div class="titleFillMini" style="flex-grow: 1"/>
 

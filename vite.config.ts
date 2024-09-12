@@ -20,6 +20,21 @@ export default defineConfig({
     },
     extensions: [".js", ".ts", ".json", ".vue"],
   },
+  server:{
+    proxy: {
+      '/api': {
+        target: "http://127.0.0.1:12538/api",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+    },
+      '/ws_api': {
+        target: "ws://127.0.0.1:12538/api",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/ws_api/, ''),
+        ws: true,
+      }
+    }
+  },
   plugins: [
     vue(),
     vueJsx(),
