@@ -74,6 +74,14 @@ const onSuccessfulEvt = (response: FileUploadDBResponse, uploadFile: UploadFile,
   emit('onSuccess', response, uploadFile, uploadFiles)
 }
 
+// onErrorEvt
+const onErrorEvt = (error: Error, uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+  filePreviewProgress.value = 5
+  filePreviewStatus.value = 'exception'
+  ElMessage.error('上传文件失败，请重试')
+  emit('onError', error, uploadFile, uploadFiles)
+}
+
 // filePreview
 const filePreviewRaw = ref<File>()
 const filePreviewProgress = ref<number>(0)
@@ -108,7 +116,7 @@ const emit = defineEmits<{
       :on-exceed="handleExceed"
       :show-file-list="false"
       action="/api/file/"
-      :on-error="(error, file, fileList) => emit('onError', error, file, fileList)"
+      :on-error="(error, file, fileList) => onErrorEvt(error, file, fileList)"
       method="post"
 
       :auto-upload="props.autoUpload"
