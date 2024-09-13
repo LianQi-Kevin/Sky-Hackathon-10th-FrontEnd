@@ -10,12 +10,16 @@ interface propsType {
   maxlength?: number;
   placeholder?: string;
   roleSize?: boolean | {minRows?: number, maxRows?: number};
+  showStatusBox?: boolean;
+  StatusBoxStatus?: 'warning' | 'danger' | 'success' | 'info' | '' | 'primary';
 }
 
 const props = withDefaults(defineProps<propsType>(), {
   maxlength: 4000,
   placeholder: 'Please type here',
-  roleSize: () => {return {minRows: 1, maxRows: 8}}
+  roleSize: () => {return {minRows: 1, maxRows: 15}},
+  showStatusBox: false,
+  StatusBoxStatus: 'info'
 })
 
 // actions
@@ -51,23 +55,30 @@ function handleEnterKey(event: KeyboardEvent) {
   <div class="content" style="position: relative">
     <div class="fill"/>
     <div class="chatPromptArea">
-      <el-input v-model="inputValue" :autosize="props.roleSize" :maxlength="props.maxlength" :placeholder="props.placeholder"
-                autofocus class="inputText" type="textarea"
-                @keyup.enter.native="handleEnterKey" />
-      <el-button :disabled="!(inputValue.length > 0) || submitLoading" class="submitBtn" @click="emit('submit')">
-        <el-icon v-show="!submitLoading" size="17"><Promotion/></el-icon>
-        <el-icon v-show="submitLoading" class="is-loading" size="17"><Loading/></el-icon>
-      </el-button>
+      <div v-if="props.showStatusBox" class="status_box">
+        <slot />
+      </div>
+      <div class="inputBox">
+        <el-input v-model="inputValue" :autosize="props.roleSize" :maxlength="props.maxlength" :placeholder="props.placeholder"
+                  autofocus class="inputText" type="textarea"
+                  @keyup.enter.native="handleEnterKey" />
+        <el-button v-if="!submitLoading" :disabled="!(inputValue.length > 0)" class="submitBtn" @click="emit('submit')">
+          <el-icon size="17"><Promotion/></el-icon>
+        </el-button>
+        <el-button v-else :disabled="true" class="submitBtn">
+          <el-icon class="is-loading" size="17"><Loading/></el-icon>
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
 html.dark {
-  --el-blur-glass: mix(var(--el-bg-color), rgba(0, 0, 0, 0.7), 0.7);
+  --el-blur-glass: mix(var(--el-bg-color), #4C4C4C, 0.7);
 }
 html {
-  --el-blur-glass: mix(var(--el-bg-color), rgba(255, 255, 255, 0.7), 0.7);
+  --el-blur-glass: mix(var(--el-bg-color), #FFFFFF, 0.7);
 }
 </style>
 
@@ -79,28 +90,51 @@ html {
 }
 
 .chatPromptArea {
-  border: 1px solid var(--el-box-shadow);
-  box-shadow: var(--el-box-shadow-lighter);
-
-  border-radius: 6px;
-
   // absolute
   position: absolute;
   bottom: -10px;
-  width: calc(100% - 20px);
-
-  // 毛玻璃
-  background: var(--el-blur-glass) !important;
-	-webkit-backdrop-filter: blur(10px);
-	backdrop-filter: blur(15px);
-
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-
-  padding: 10px;
+  width: 100%;
 
   margin: 0 10px 10px 0;
+  gap: 10px;
+
+  display: flex;
+  flex-direction: column;
+
+  .status_box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+
+    // 毛玻璃
+    //background: transparentize(var(--el-color-warning), 0.7) !important;
+    background: var(--el-blur-glass) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+
+    box-shadow: var(--el-box-shadow-lighter);
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .inputBox {
+    // 毛玻璃
+    //background: transparentize(var(--el-bg-color), 0.7) !important;
+    background: var(--el-blur-glass) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+
+    box-shadow: var(--el-box-shadow-lighter);
+    border-radius: 10px;
+
+    padding: 10px;
+  }
 
   .inputText {
     :deep(.el-textarea__inner) {
