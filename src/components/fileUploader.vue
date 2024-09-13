@@ -80,7 +80,8 @@ const filePreviewProgress = ref<number>(0)
 const filePreviewStatus = ref<'success' | 'warning' | 'exception' | ''>()
 // onprogressEvt
 const onprogressEvt = (evt: UploadProgressEvent) => {
-  filePreviewProgress.value = Math.floor((evt.loaded / evt.total) * 100)
+  const progress: number = Math.floor((evt.loaded / evt.total) * 100)
+  filePreviewProgress.value = progress !>= 99 ? 99 : progress
 }
 
 const emit = defineEmits<{
