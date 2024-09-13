@@ -368,10 +368,10 @@ function compareSubmitMessage() {
 }
 
 // chatMessagesLists 更新时滚动页面到底部
+const chatMessagesRef = ref()
 watch(chatMessagesLists, () => {
-  const chatMessages = document.querySelector('.chatMessages')
-  if (chatMessages) {
-    chatMessages.scrollTop = chatMessages.scrollHeight
+  if (chatMessagesRef) {
+    chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
   }
 }, {deep: true, flush: 'post'})
 </script>
@@ -388,7 +388,7 @@ watch(chatMessagesLists, () => {
           </template>
         </el-empty>
       </div>
-      <div class="chatMessages" v-show="chatMessagesLists.length !== 0">
+      <div v-show="chatMessagesLists.length !== 0" ref="chatMessagesRef" class="chatMessages">
         <template v-for="(message, index) in chatMessagesLists" :key="index">
           <chat-message :content="message.content" :role="message.role"/>
         </template>
