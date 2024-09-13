@@ -54,62 +54,68 @@ interface embeddedParams {
   nv_api_key: string;
 }
 
-function fileEmbedded({file_id, file_md5, nv_api_key}: embeddedParams){
+function fileEmbedded({file_id, file_md5, nv_api_key}: embeddedParams): Promise<FileUploadDBResponse>{
   console.debug("fileEmbedded", file_id, file_md5)
 
-  const baseUrl = `/api/file/${file_id}`;
-  const params = new URLSearchParams({
-    file_md5: file_md5,
-    nv_api_key: nv_api_key,
-  });
-  const socket = new WebSocket(`${baseUrl}?${params.toString()}`)
-  socket.onopen = function() {
-    console.debug("socket open")
-    submitLoadingStatus.value = true
-  }
-  socket.onmessage = function(event: MessageEvent) {
-    statusBoxVisible.value = true;
-    console.debug("socket message")
-    console.debug(event.data)
-    const data = JSON.parse(event.data) as FileEmbeddedResponse
-    switch (data.status) {
-      case "success":
-        statusBoxMessage.value = data.message
-        statusBoxStatus.value = 'success'
-        if (standardFileParams.value && data.data) {
-          Object.assign(standardFileParams.value, data.data);
-        }
-        break;
-      case "embedding":
-        statusBoxMessage.value = data.status
-        statusBoxStatus.value = 'primary'
-        break;
-      case "field":
-        statusBoxMessage.value = data.message
-        statusBoxStatus.value = 'danger'
-        break;
-      default:
-        statusBoxMessage.value = data.message
-        statusBoxStatus.value = 'info'
+  return new Promise((resolve, reject) => {
+    const baseUrl = `/api/file/${file_id}`;
+    const params = new URLSearchParams({
+      file_md5: file_md5,
+      nv_api_key: nv_api_key,
+    });
+    const socket = new WebSocket(`${baseUrl}?${params.toString()}`)
+    socket.onopen = function() {
+      console.debug("socket open")
+      submitLoadingStatus.value = true
     }
-  }
-  socket.onerror = function(event: Event) {
-    console.debug("socket error", event);
-    statusBoxVisible.value = false;
-  }
-  socket.onclose = function(event: CloseEvent) {
-    console.debug("socket close", event);
-    if (event.code === 1000) {
-      console.debug("socket close success");
-      console.log("standardFileParams", standardFileParams)
-    } else {
-      console.error("socket close error", event)
-      ElMessage.error(event.reason)
-      statusBoxStatus.value = 'danger';
-      statusBoxMessage.value = event.reason;
+    socket.onmessage = function(event: MessageEvent) {
+      statusBoxVisible.value = true;
+      console.debug("socket message")
+      console.debug(event.data)
+      const data = JSON.parse(event.data) as FileEmbeddedResponse
+      switch (data.status) {
+        case "success":
+          statusBoxMessage.value = data.message
+          statusBoxStatus.value = 'success'
+          if (standardFileParams.value && data.data) {
+            Object.assign(standardFileParams.value, data.data);
+          }
+          resolve(standardFileParams.value as FileUploadDBResponse)
+          break;
+        case "embedding":
+          statusBoxMessage.value = data.status
+          statusBoxStatus.value = 'primary'
+          break;
+        case "field":
+          statusBoxMessage.value = data.message
+          statusBoxStatus.value = 'danger'
+          reject(new Error("WebSocket error"));
+          break;
+        default:
+          statusBoxMessage.value = data.message
+          statusBoxStatus.value = 'info'
+      }
     }
-    statusBoxVisible.value = false;
-  }
+    socket.onerror = function(event: Event) {
+      console.debug("socket error", event);
+      statusBoxVisible.value = false;
+      reject(new Error("WebSocket error"));
+    }
+    socket.onclose = function(event: CloseEvent) {
+      console.debug("socket close", event);
+      if (event.code === 1000) {
+        console.debug("socket close success");
+        console.log("standardFileParams", standardFileParams)
+      } else {
+        console.error("socket close error", event)
+        ElMessage.error(event.reason)
+        statusBoxStatus.value = 'danger';
+        statusBoxMessage.value = event.reason;
+        reject(new Error("WebSocket error"));
+      }
+      statusBoxVisible.value = false;
+    }
+  })
 }
 
 
@@ -267,34 +273,33 @@ function querySubmitMessage() {
   // 添加 query 到 chatMessagesLists
   chatMessagesLists.value.push({role: 'user', content: inputValue.value})
 
-  // 检查 standardFileParams.embedded_status 是否为 embedded
-  if (standardFileParams.value.embedded_status !== 'embedded') {
-    // 调用 fileEmbedded
-    fileEmbedded({
-      file_id: standardFileParams.value.id,
-      file_md5: standardFileParams.value.md5_code,
-      nv_api_key: nvapi_ref.value
-    })
-  }
+  // 调用 fileEmbedded
+  fileEmbedded({
+    file_id: standardFileParams.value.id,
+    file_md5: standardFileParams.value.md5_code,
+    nv_api_key: nvapi_ref.value
+  }).then(() => {
+    if (standardFileParams.value && inputValue.value) {
+      // 创建 query
+      chatMessagesLists.value.push({role: 'assistant', content: ''})
+      invoke({
+        standard_file_id: standardFileParams.value.id,
+        standard_file_md5: standardFileParams.value.md5_code,
+        nv_api_key: nvapi_ref.value,
+        question: inputValue.value,
+        request_type: 'query'
+      })
 
-  // 创建 query
-  chatMessagesLists.value.push({role: 'assistant', content: ''})
-  invoke({
-    standard_file_id: standardFileParams.value.id,
-    standard_file_md5: standardFileParams.value.md5_code,
-    nv_api_key: nvapi_ref.value,
-    question: inputValue.value,
-    request_type: 'query'
-  })
+      // clear input value
+      inputValue.value = ''
 
-  // clear input value
-  inputValue.value = ''
-
-  // move scrollbar to bottom
-  nextTick(() => {
-    const chatMessages = document.querySelector('.chatMessages')
-    if (chatMessages) {
-      chatMessages.scrollTop = chatMessages.scrollHeight
+      // move scrollbar to bottom
+      nextTick(() => {
+        const chatMessages = document.querySelector('.chatMessages')
+        if (chatMessages) {
+          chatMessages.scrollTop = chatMessages.scrollHeight
+        }
+      })
     }
   })
 }
@@ -340,30 +345,30 @@ function compareSubmitMessage() {
   // 开始提交
   submitLock.value = true
 
-  // 检查 standardFileParams.embedded_status 是否为 embedded
-  if (standardFileParams.value.embedded_status !== 'embedded') {
-    // 调用 fileEmbedded
-    fileEmbedded({
-      file_id: standardFileParams.value.id,
-      file_md5: standardFileParams.value.md5_code,
-      nv_api_key: nvapi_ref.value
-    })
-  }
+  // 调用 fileEmbedded
+  fileEmbedded({
+    file_id: standardFileParams.value.id,
+    file_md5: standardFileParams.value.md5_code,
+    nv_api_key: nvapi_ref.value
+  }).then(() => {
+    // 创建 compare
+    if (chatMessagesLists.value.length !== 0) {
+      // clear chatMessagesLists
+      chatMessagesLists.value.length = 0
+    }
 
-  // 创建 compare
-  if (chatMessagesLists.value.length !== 0) {
-    // clear chatMessagesLists
-    chatMessagesLists.value.length = 0
-  }
-
-  chatMessagesLists.value.push({role: 'assistant', content: ''})
-  invoke({
-    standard_file_id: standardFileParams.value.id,
-    standard_file_md5: standardFileParams.value.md5_code,
-    schema_file_id: schemaFileParams.value.id,
-    schema_file_md5: schemaFileParams.value.md5_code,
-    nv_api_key: nvapi_ref.value,
-    request_type: 'compare'
+    // 构造 compare 请求
+    if (standardFileParams.value && schemaFileParams.value) {
+      chatMessagesLists.value.push({role: 'assistant', content: ''})
+      invoke({
+        standard_file_id: standardFileParams.value.id,
+        standard_file_md5: standardFileParams.value.md5_code,
+        schema_file_id: schemaFileParams.value.id,
+        schema_file_md5: schemaFileParams.value.md5_code,
+        nv_api_key: nvapi_ref.value,
+        request_type: 'compare'
+      })
+    }
   })
 }
 
@@ -379,7 +384,7 @@ watch(chatMessagesLists, () => {
 <template>
   <div class="container">
     <div class="chatContainer">
-      <div class="chatMessages" v-show="chatMessagesLists.length === 0">
+      <div v-show="chatMessagesLists.length === 0" class="chatMessages">
         <el-empty style="height: 100%;">
           <template #default>
             <h2>欢迎使用国标咨询工具</h2>
@@ -394,8 +399,11 @@ watch(chatMessagesLists, () => {
         </template>
       </div>
 
-      <el-button v-if="modeSwitchRef" :disabled="submitLoadingStatus" class="invokeBtn" round @click="compareSubmitMessage">开始对比</el-button>
-      <chatInputArea v-else v-model:inputValue="inputValue" v-model:submitLoading="submitLoadingStatus" :show-status-box="statusBoxVisible"
+      <el-button v-if="modeSwitchRef" :disabled="submitLoadingStatus" class="invokeBtn" round
+                 @click="compareSubmitMessage">开始对比
+      </el-button>
+      <chatInputArea v-else v-model:inputValue="inputValue" v-model:submitLoading="submitLoadingStatus"
+                     :show-status-box="statusBoxVisible"
                      class="queryBtn" @submit="querySubmitMessage">
         <div class="status__inner">
           <el-icon v-if="statusBoxStatus !== 'success' && statusBoxStatus !== 'danger'" class="is-loading"
@@ -476,7 +484,7 @@ watch(chatMessagesLists, () => {
       display: block;
     }
 
-    .chatMessages{
+    .chatMessages {
       flex-grow: 1;
       overflow-y: auto;
       overflow-x: hidden;
