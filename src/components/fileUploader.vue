@@ -59,7 +59,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile: UploadRawFile) => {
   }
 
   // 重置状态
-  filePreviewStatus.value = null;
+  filePreviewStatus.value = '';
   return true
 }
 // 请求参数添加文件md5
@@ -77,7 +77,7 @@ const onSuccessfulEvt = (response: FileUploadDBResponse, uploadFile: UploadFile,
 // filePreview
 const filePreviewRaw = ref<File>()
 const filePreviewProgress = ref<number>(0)
-const filePreviewStatus = ref<'success' | 'warning' | 'exception' | null>()
+const filePreviewStatus = ref<'success' | 'warning' | 'exception' | ''>()
 // onprogressEvt
 const onprogressEvt = (evt: UploadProgressEvent) => {
   filePreviewProgress.value = Math.floor((evt.loaded / evt.total) * 100)

@@ -6,7 +6,7 @@ import {formatFileSize} from "@/tools/file";
 interface propsType {
   raw?: File,
   progress?: number,
-  status?: 'success' | 'warning' | 'exception' | null
+  status?: 'success' | 'warning' | 'exception' | ""
 }
 
 const props = withDefaults(defineProps<propsType>(), {});
