@@ -100,6 +100,8 @@ function fileEmbedded({file_id, file_md5, nv_api_key}: embeddedParams): Promise<
       console.debug("socket error", event);
       statusBoxVisible.value = false;
       reject(new Error("WebSocket error"));
+      submitLock.value = false;
+      submitLoadingStatus.value = false;
     }
     socket.onclose = function(event: CloseEvent) {
       console.debug("socket close", event);
@@ -224,6 +226,8 @@ function invoke({
 
       socket.onerror = function (event) {
         console.debug("socket error", event)
+        submitLoadingStatus.value = false
+        submitLock.value = false
       }
 
     socket.onclose = function (event) {
