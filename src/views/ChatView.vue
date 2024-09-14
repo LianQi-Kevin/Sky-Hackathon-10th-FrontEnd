@@ -402,7 +402,13 @@ watch(chatMessagesLists, () => {
           <chat-message :content="message.content" :role="message.role"/>
         </template>
       </div>
-
+      <div v-if="modeSwitchRef" v-show="statusBoxVisible" class="compareStatusBox">
+        <el-icon v-if="statusBoxStatus !== 'success' && statusBoxStatus !== 'danger'" class="is-loading"
+                 style="margin: 0 10px 0 0; font-size: 17px;">
+          <Loading/>
+        </el-icon>
+        <el-text :type="statusBoxStatus" size="large" text>{{ statusBoxMessage }}</el-text>
+      </div>
       <el-button v-if="modeSwitchRef" :disabled="submitLoadingStatus" class="invokeBtn" round
                  @click="compareSubmitMessage">开始对比
       </el-button>
@@ -484,6 +490,8 @@ watch(chatMessagesLists, () => {
     flex-direction: column;
     gap: 10px;
 
+    position: relative;
+
     ::-webkit-scrollbar {
       display: block;
     }
@@ -496,6 +504,28 @@ watch(chatMessagesLists, () => {
       :deep(.el-empty__description) {
         display: none;
       }
+    }
+
+    .compareStatusBox {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      margin: 0 10px 0 20px;
+
+      position: absolute;
+      bottom: 50px;
+      width: calc(100% - 50px);
+
+      // 毛玻璃
+      //background: transparentize(var(--el-color-warning), 0.7) !important;
+      background: var(--el-blur-glass) !important;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(15px);
+
+      box-shadow: var(--el-box-shadow-lighter);
+      border-radius: 999px;
+      padding: 10px;
     }
 
     .invokeBtn {
