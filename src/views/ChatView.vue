@@ -566,6 +566,7 @@ watch(chatMessagesLists, () => {
 
       .standard {
         flex-grow: 1;
+        max-height: 200px;
 
         .standard_upload {
           margin: 20px 0 0 0;

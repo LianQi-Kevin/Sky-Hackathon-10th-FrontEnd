@@ -16,12 +16,9 @@
     "@volar/language-server": "2.4.0-alpha.18",
     "@vue/language-server": "2.0.28",
     "@vueuse/core": "^10.11.0",
-    "axios": "^1.7.2",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.7.6",
-    "localforage": "^1.10.0",
     "markdown-it": "^14.1.0",
-    "nanoid": "^5.0.7",
     "path-browserify": "^1.0.1",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"
