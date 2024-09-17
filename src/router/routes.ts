@@ -1,4 +1,5 @@
 import ChatView from "@/views/ChatView.vue";
+import notFound from "@/views/notFound.vue";
 import type {RouteRecordRaw} from "vue-router";
 
 const routes: RouteRecordRaw[] = [
@@ -12,22 +13,6 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: "/draw",
-    name: "Draw",
-    component: () => import("@/views/DrawView.vue"),
-    meta: {
-      title: "Draw"
-    }
-  },
-  {
-    path: "/test",
-    name: "Test",
-    component: () => import("@/views/TestView.vue"),
-    meta: {
-      title: "Test"
-    }
-  },
-  {
     path: "/about",
     name: "About",
     component: () => import("@/views/AboutView.vue"),
@@ -37,7 +22,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/error/:id',
-    component: () => import('@/views/notFound.vue'),
+    component: notFound,
     props: true,
     meta: {
       title: 'ERROR',
