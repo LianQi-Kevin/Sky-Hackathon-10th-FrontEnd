@@ -78,5 +78,21 @@ const markdownString: string = '### 第十届 Sky Hackathon 参赛项目书\n' +
   max-width: 1200px;
   margin: 20px auto;
   overflow-x: hidden;
+
+  img {
+    display: block;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .aboutContainer {
+    padding: 0 20px;
+
+    img {
+      max-width: 100%;
+    }
+  }
 }
 </style>
